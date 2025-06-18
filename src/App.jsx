@@ -46,7 +46,7 @@ function App() {
 		});
 		setBoard(newBoard);
 
-		setSelectedRow((selectedRow + 1) % num);
+		setSelectedRow((selectedRow + 1) % lastRow);
 	}, 500);
 
 	if (lastRow === 2) {
