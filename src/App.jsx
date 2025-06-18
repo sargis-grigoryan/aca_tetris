@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.scss';
 
 let isTrue = false;
-let num = 20;
+let lastRow = 20;
 
 function App() {
 	const width = 10;
@@ -29,7 +29,7 @@ function App() {
 				});
 			}
 
-			if (rowIndex >= num && isTrue) {
+			if (rowIndex >= lastRow && isTrue) {
 				return row.map((_, cellIndex) => {
 					if (cellIndex === selectedJ) {
 						return true;
@@ -37,20 +37,19 @@ function App() {
 				});
 			}
 
-			if (selectedRow + 1 === num) {
+			if (selectedRow + 1 === lastRow) {
 				isTrue = true;
-				num--;
+				lastRow--;
 			}
 
 			return row;
 		});
-
 		setBoard(newBoard);
 
 		setSelectedRow((selectedRow + 1) % num);
 	}, 500);
 
-	if (num === 2) {
+	if (lastRow === 2) {
 		clearTimeout(timeoutID);
 		alert('game over');
 
