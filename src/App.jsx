@@ -5,7 +5,6 @@ let isTrue = false;
 let num = 20;
 
 function App() {
-	console.log('Rerendered!');
 	const width = 10;
 	const height = 20;
 	const [selectedRow, setSelectedRow] = useState(0);
@@ -47,10 +46,8 @@ function App() {
 		});
 
 		setBoard(newBoard);
-		console.log((selectedRow + 1) % height);
-		console.log((selectedRow + 1) % num);
 
-		setSelectedRow((selectedRow % num) + 1);
+		setSelectedRow((selectedRow + 1) % num);
 	}, 500);
 
 	if (num === 2) {
