@@ -1,67 +1,84 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.scss';
-
-let isTrue = false;
-let lastRow = 20;
 
 function App() {
 	const width = 10;
 	const height = 20;
 	const [selectedRow, setSelectedRow] = useState(0);
+	const [selectedJ, setSelectedJ] = useState(5);
+	const [lastRow, setLastRow] = useState(height);
+	const [isTrue, setIsTrue] = useState(false);
 	const [board, setBoard] = useState(() =>
 		Array(height)
 			.fill(null)
 			.map(() => Array(width).fill(null))
 	);
 
-	let selectedJ = 5;
-	let timeoutID = setTimeout(() => {
-		const newBoard = board.map((row, rowIndex) => {
-			if ((rowIndex + 1) % height === selectedRow) {
-				return row.fill(false);
+	useEffect(() => {
+		const handleKeyDown = e => {
+			if (e.key === 'ArrowLeft') {
+				setSelectedJ(prev => prev - 1);
 			}
+			if (e.key === 'ArrowRight') {
+				setSelectedJ(prev => prev + 1);
+			}
+		};
 
-			if (rowIndex === selectedRow) {
-				return row.map((_, cellIndex) => {
-					if (cellIndex === selectedJ) {
-						return true;
-					}
-				});
-			}
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, []);
 
-			if (rowIndex >= lastRow && isTrue) {
-				return row.map((_, cellIndex) => {
-					if (cellIndex === selectedJ) {
-						return true;
-					}
-				});
-			}
+	useEffect(() => {
+		if (lastRow <= 1) return;
+
+		const timeoutID = setTimeout(() => {
+			const newBoard = board.map((row, rowIndex) => {
+				if ((rowIndex + 1) % height === selectedRow) {
+					return row.fill(false);
+				}
+
+				if (rowIndex === selectedRow) {
+					return row.map((_, cellIndex) =>
+						cellIndex === selectedJ ? true : false
+					);
+				}
+
+				if (rowIndex >= lastRow && isTrue) {
+					return row.map((_, cellIndex) =>
+						cellIndex === selectedJ ? true : false
+					);
+				}
+
+				return row;
+			});
 
 			if (selectedRow + 1 === lastRow) {
-				isTrue = true;
-				lastRow--;
+				setIsTrue(true);
+				setLastRow(prev => prev - 1);
 			}
 
-			return row;
-		});
-		setBoard(newBoard);
+			setBoard(newBoard);
+			setSelectedRow((selectedRow + 1) % lastRow);
+		}, 200);
 
-		setSelectedRow((selectedRow + 1) % lastRow);
-	}, 500);
+		return () => clearTimeout(timeoutID);
+	}, [board, selectedRow, selectedJ, isTrue, lastRow]);
 
-	if (lastRow === 2) {
-		clearTimeout(timeoutID);
-		alert('game over');
-
-		return;
-	}
+	useEffect(() => {
+		if (lastRow <= 1) {
+			alert('Game over');
+		}
+	}, [lastRow]);
 
 	return (
 		<div className='container'>
-			{board.map(row => (
-				<div className='row'>
-					{row.map(cell => (
-						<div className={`cell ${cell === true ? 'marked' : ''}`}></div>
+			{board.map((row, rowIndex) => (
+				<div className='row' key={rowIndex}>
+					{row.map((cell, cellIndex) => (
+						<div
+							key={cellIndex}
+							className={`cell ${cell === true ? 'marked' : ''}`}
+						></div>
 					))}
 				</div>
 			))}
