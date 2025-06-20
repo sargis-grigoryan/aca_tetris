@@ -1,74 +1,72 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import './App.scss';
 
 function App() {
 	const width = 10;
 	const height = 20;
-	const [selectedRow, setSelectedRow] = useState(0);
-	const [selectedJ, setSelectedJ] = useState(5);
-	// const [lastRow, setLastRow] = useState(height);
-	// const [isTrue, setIsTrue] = useState(false);
+	const [current, setCurrent] = useState({ row: 0, col: 5 });
 	const [board, setBoard] = useState(() =>
-		Array(height)
-			.fill(null)
-			.map(() => Array(width).fill(null))
+		Array.from({ length: height }, (_, row) =>
+			Array.from({ length: width }, (_, col) =>
+				row === 0 && col === 5 ? true : null
+			)
+		)
 	);
 
 	useEffect(() => {
 		const handleKeyDown = e => {
-			if (e.key === 'ArrowLeft') {
-				setSelectedJ(prev => Math.max(prev - 1, 0));
-			}
-			if (e.key === 'ArrowRight') {
-				setSelectedJ(prev => Math.min(prev + 1, width - 1));
-			}
+			setBoard(prev => {
+				const newBoard = prev.map(row => [...row]);
+				newBoard[current.row][current.col] = null;
+
+				let newCol = current.col;
+				if (e.key === 'ArrowLeft' && current.col > 0) {
+					newCol--;
+				}
+				if (e.key === 'ArrowRight' && current.col < width - 1) {
+					newCol++;
+				}
+
+				newBoard[current.row][newCol] = true;
+				setCurrent({ ...current, col: newCol });
+
+				return newBoard;
+			});
 		};
 
 		document.addEventListener('keydown', handleKeyDown);
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, []);
+	}, [current]);
 
 	useEffect(() => {
-		// if (lastRow <= 1) return;
+		const interval = setInterval(() => {
+			setBoard(prev => {
+				const newBoard = prev.map(row => [...row]);
 
-		const timeoutID = setTimeout(() => {
-			const newBoard = board.map((row, rowIndex) => {
-				if ((rowIndex + 1) % height === selectedRow) {
-					return row.fill(false);
+				if (current.row < height) {
+					newBoard[current.row][current.col] = null;
 				}
 
-				if (rowIndex === selectedRow) {
-					return row.map((_, cellIndex) =>
-						cellIndex === selectedJ ? true : false
-					);
+				if (
+					current.row + 1 === height ||
+					newBoard[current.row + 1][current.col] === true
+				) {
+					newBoard[current.row][current.col] = true;
+					setCurrent({ row: 0, col: 5 });
+					return newBoard;
 				}
+				const newRow = current.row + 1;
+				newBoard[newRow][current.col] = true;
+				setCurrent({ row: newRow, col: current.col });
 
-				// if (rowIndex >= lastRow && isTrue) {
-				// 	return row.map((_, cellIndex) =>
-				// 		cellIndex === selectedJ ? true : false
-				// 	);
-				// }
-
-				return row;
+				return newBoard;
 			});
+		}, 500);
 
-			// if (selectedRow + 1 === lastRow) {
-			// 	setIsTrue(true);
-			// 	setLastRow(prev => prev - 1);
-			// }
+		return () => clearInterval(interval);
+	}, [current]);
 
-			setBoard(newBoard);
-			setSelectedRow((selectedRow + 1) % height);
-		}, 200);
-
-		return () => clearTimeout(timeoutID);
-	}, [board, selectedRow, selectedJ]);
-
-	// useEffect(() => {
-	// 	if (lastRow <= 1) {
-	// 		alert('Game over');
-	// 	}
-	// }, [lastRow]);
+	console.log(board[19]);
 
 	return (
 		<div className='container'>
