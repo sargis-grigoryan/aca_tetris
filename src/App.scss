@@ -1,35 +1,3 @@
-// .container {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 2px;
-//   margin: 20px;
-// }
-
-// .row {
-//   display: flex;
-//   gap: 2px;
-// }
-
-// .cell {
-//   width: 20px;
-//   height: 20px;
-//   background-color: #eee;
-//   border: 1px solid #ccc;
-// }
-
-// .cell.marked {
-//   background-color: #333;
-// }
-
-// .cell.falling {
-//   background-color: red;
-// }
- 
- 
- 
- 
- 
- 
 .container {
   display: flex;
   flex-direction: column;
@@ -37,19 +5,25 @@
   border-radius: 5px;
   width: fit-content;
   margin: auto;
-
-  .row {
-    display: flex;
-    width: fit-content;
-
-    .cell {
-      border: 1px solid gray;
-      width: 30px;
-      height: 30px;
-
-      &.marked {
-        background-color: #fb4b4b;
-      }
-    }
-  }
 }
+
+.row {
+ display: flex;
+  width: fit-content;
+}
+
+.cell {
+  border: 1px solid gray;
+  width: 30px;
+  height: 30px;
+}
+
+.cell.marked {
+  background-color: #fb4b4b;
+}
+
+.cell.falling {
+  background-color: red;
+}
+ 
+ 
