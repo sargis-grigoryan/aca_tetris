@@ -6,8 +6,8 @@ function App() {
 	const height = 20;
 	const [selectedRow, setSelectedRow] = useState(0);
 	const [selectedJ, setSelectedJ] = useState(5);
-	const [lastRow, setLastRow] = useState(height);
-	const [isTrue, setIsTrue] = useState(false);
+	// const [lastRow, setLastRow] = useState(height);
+	// const [isTrue, setIsTrue] = useState(false);
 	const [board, setBoard] = useState(() =>
 		Array(height)
 			.fill(null)
@@ -17,10 +17,10 @@ function App() {
 	useEffect(() => {
 		const handleKeyDown = e => {
 			if (e.key === 'ArrowLeft') {
-				setSelectedJ(prev => prev - 1);
+				setSelectedJ(prev => Math.max(prev - 1, 0));
 			}
 			if (e.key === 'ArrowRight') {
-				setSelectedJ(prev => prev + 1);
+				setSelectedJ(prev => Math.min(prev + 1, width - 1));
 			}
 		};
 
@@ -29,7 +29,7 @@ function App() {
 	}, []);
 
 	useEffect(() => {
-		if (lastRow <= 1) return;
+		// if (lastRow <= 1) return;
 
 		const timeoutID = setTimeout(() => {
 			const newBoard = board.map((row, rowIndex) => {
@@ -43,32 +43,32 @@ function App() {
 					);
 				}
 
-				if (rowIndex >= lastRow && isTrue) {
-					return row.map((_, cellIndex) =>
-						cellIndex === selectedJ ? true : false
-					);
-				}
+				// if (rowIndex >= lastRow && isTrue) {
+				// 	return row.map((_, cellIndex) =>
+				// 		cellIndex === selectedJ ? true : false
+				// 	);
+				// }
 
 				return row;
 			});
 
-			if (selectedRow + 1 === lastRow) {
-				setIsTrue(true);
-				setLastRow(prev => prev - 1);
-			}
+			// if (selectedRow + 1 === lastRow) {
+			// 	setIsTrue(true);
+			// 	setLastRow(prev => prev - 1);
+			// }
 
 			setBoard(newBoard);
-			setSelectedRow((selectedRow + 1) % lastRow);
+			setSelectedRow((selectedRow + 1) % height);
 		}, 200);
 
 		return () => clearTimeout(timeoutID);
-	}, [board, selectedRow, selectedJ, isTrue, lastRow]);
+	}, [board, selectedRow, selectedJ]);
 
-	useEffect(() => {
-		if (lastRow <= 1) {
-			alert('Game over');
-		}
-	}, [lastRow]);
+	// useEffect(() => {
+	// 	if (lastRow <= 1) {
+	// 		alert('Game over');
+	// 	}
+	// }, [lastRow]);
 
 	return (
 		<div className='container'>
