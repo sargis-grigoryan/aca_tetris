@@ -1,32 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.scss";
 import { move } from "./service";
 import { DIRECTIONS } from "./constants";
+import { SHAPES } from "./shapes";
+
 
 const width = 10;
-const height = 25;
-const initialShape = [
-  {
-    i: -4,
-    j: 5,
-  },
-  {
-    i: -3,
-    j: 5,
-  },
-  {
-    i: -2,
-    j: 5,
-  },
-  {
-    i: -1,
-    j: 5,
-  },
-];
+const height = 20;
 
 function App() {
   const [isGameOver, setIsGameOver] = useState(false);
-  const [shape, setShape] = useState(initialShape);
+  const currentShapeRef = useRef(1)
+  const [shape, setShape] = useState(SHAPES[0]);
 
   const [board, setBoard] = useState(() =>
     Array(height)
@@ -34,40 +19,65 @@ function App() {
       .map(() => Array(width).fill(false))
   );
 
-  // useEffect(() => {
-  //   const eventHandler = ({ key }) => {
-  //     if (key === "ArrowLeft") {
-  //       if (selectedColumn > 0) {
-  //         setSelectedColumn(selectedColumn - 1);
-  //       }
-  //     }
+  useEffect(() => {
+    const eventHandler = ({ key }) => {
+        if (key === "ArrowLeft") {
+          try {
+            const {newBoard,newShape} = move(board,shape,DIRECTIONS.LEFT)
+            setBoard(newBoard)
+            setShape(newShape)
+          }
+          catch(e) {
+            console.error(e)
+          }
+      }
 
-  //     if (key === "ArrowRight") {
-  //       if (selectedColumn < width - 1) {
-  //         setSelectedColumn(selectedColumn + 1);
-  //       }
-  //     }
-  //   };
+      if (key === "ArrowRight") {
+        try {
+          const {newBoard,newShape} = move(board,shape,DIRECTIONS.RIGHT)
+          setBoard(newBoard)
+          setShape(newShape)
+        }
+        catch(e) {
+          console.error(e)
+        }
+      }
+    
+    };
 
-  //   document.addEventListener("keydown", eventHandler);
+    document.addEventListener("keydown", eventHandler);
 
-  //   return () => {
-  //     document.removeEventListener("keydown", eventHandler);
-  //   };
-  // }, []);
+    return () => {
+      document.removeEventListener("keydown", eventHandler);
+    };
+  }, [board,shape]);
 
   useEffect(() => {
-    try {
-      const { newBoard, newShape } = move(board, shape, DIRECTIONS.DOWN);
+    const timer = setTimeout(() => {
+      try {
+        const { newBoard, newShape } = move(board, shape, DIRECTIONS.DOWN);
+        setBoard(newBoard);
+        setShape(newShape);
+        setIsGameOver(false)
+      } catch (e) {
+        const isFinished = shape.some(({i}) => i <= 0)
+        if(!isFinished) {
+          setShape(SHAPES[currentShapeRef.current])
+          currentShapeRef.current = (currentShapeRef.current + 1) % SHAPES.length
+        }
+        else {
+          setIsGameOver(true)
+          alert("Game Over")
+        }
+        console.error(e);
+      }
+    },500)
 
-      setBoard(newBoard);
-      setShape(newShape);
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
+    return () => clearTimeout(timer)
+  }, [board,shape]);
 
   return (
+    <div style={{display:"flex"}}>
     <div className="container">
       {board.map((row) => (
         <div className="row">
@@ -76,6 +86,10 @@ function App() {
           ))}
         </div>
       ))}
+    </div>
+    <div className="">
+      78978797979797979797
+    </div>
     </div>
   );
 }

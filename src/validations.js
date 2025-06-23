@@ -38,7 +38,7 @@ export const validateLeftMove = (board, shape) => {
     const isShapePart = checkIsShapePart(shape, i, j - 1);
 
     // if some part of the shape is in the first column or the left cell is already occupied
-    if (!isShapePart && (j === 0 || board[i][j - 1])) {
+    if (!isShapePart && i >= 0 && (j === 0 || board[i][j - 1])) {
       throw new Error("Left move was failed");
     }
   });
@@ -62,7 +62,6 @@ export const validateDownMove = (board, shape) => {
 
   shape.forEach(({ i, j }) => {
     const isShapePart = checkIsShapePart(shape, i + 1, j);
-
     // if some part of the shape is in the bottom or the bellow cell is already occupied
     // i + 1 >= 0 condition means cells already in the board or going to be displayed
     if (!isShapePart && i + 1 >= 0 && (i === height - 1 || board[i + 1][j])) {
