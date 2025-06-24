@@ -1,94 +1,61 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import './App.scss';
+import { move } from './service';
+import { DIRECTIONS } from './constants';
+
+const width = 10;
+const height = 25;
+const initialShape = [
+	{
+		i: -4,
+		j: 5,
+	},
+	{
+		i: -3,
+		j: 5,
+	},
+	{
+		i: -2,
+		j: 5,
+	},
+	{
+		i: -1,
+		j: 5,
+	},
+];
 
 function App() {
+	console.log('Rerendered!');
 	const width = 10;
 	const height = 20;
-	const [current, setCurrent] = useState({ row: 0, col: 5 });
+	const [selectedRow, setSelectedRow] = useState(0);
 	const [board, setBoard] = useState(() =>
-		Array.from({ length: height }, (_, row) =>
-			Array.from({ length: width }, (_, col) =>
-				row === 0 && col === 5 ? true : null
-			)
-		)
+		Array(height)
+			.fill(null)
+			.map(() => Array(width).fill(null))
 	);
-	useEffect(() => {
-		const handleKeyDown = e => {
-			setBoard(prev => {
-				const newBoard = prev.map(row => [...row]);
-				newBoard[current.row][current.col] = null;
 
-				let newCol = current.col;
-				let newRow = current.row;
-				if (
-					e.key === 'ArrowLeft' &&
-					current.col > 0 &&
-					newBoard[current.row][current.col - 1] !== true
-				) {
-					newCol--;
-				}
-				if (
-					e.key === 'ArrowRight' &&
-					current.col < width - 1 &&
-					newBoard[current.row][current.col + 1] !== true
-				) {
-					newCol++;
-				}
-				if (
-					e.key === 'ArrowDown' &&
-					current.row < height - 1 &&
-					newBoard[current.row + 1][current.col] !== true
-				) {
-					newRow++;
-				}
+	let selectedJ = 5;
+	setTimeout(() => {
+		const newBoard = board.map((row, rowIndex) => {
+			if ((rowIndex + 1) % height === selectedRow) {
+				return row.fill(false);
+			}
 
-				newBoard[newRow][newCol] = true;
-				setCurrent({ row: newRow, col: newCol });
-
-				return newBoard;
-			});
-		};
-
-		document.addEventListener('keydown', handleKeyDown);
-		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, []);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setBoard(prev => {
-				const newBoard = prev.map(row => [...row]);
-
-				if (current.row < height) {
-					newBoard[current.row][current.col] = null;
-				}
-
-				if (
-					current.row + 1 === height ||
-					newBoard[current.row + 1][current.col] === true
-				) {
-					newBoard[current.row][current.col] = true;
-					setCurrent({ row: 0, col: 5 });
-
-					if (
-						newBoard[current.row][current.col] === true &&
-						current.row === 1
-					) {
-						alert('game over');
-						return;
+			if (rowIndex === selectedRow) {
+				return row.map((_, cellIndex) => {
+					if (cellIndex === selectedJ) {
+						return true;
 					}
-					return newBoard;
-				}
+				});
+			}
 
-				const newRow = current.row + 1;
-				newBoard[newRow][current.col] = true;
-				setCurrent({ row: newRow, col: current.col });
+			return row;
+		});
 
-				return newBoard;
-			});
-		}, 500);
-
-		return () => clearInterval(interval);
-	}, [current]);
+		setBoard(newBoard);
+		setSelectedRow((selectedRow + 1) % height);
+	}, 200);
 
 	return (
 		<div className='container'>
