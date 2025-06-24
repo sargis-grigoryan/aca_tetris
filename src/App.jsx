@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.scss';
 
 function App() {
@@ -12,7 +12,6 @@ function App() {
 			)
 		)
 	);
-
 	useEffect(() => {
 		const handleKeyDown = e => {
 			setBoard(prev => {
@@ -20,15 +19,31 @@ function App() {
 				newBoard[current.row][current.col] = null;
 
 				let newCol = current.col;
-				if (e.key === 'ArrowLeft' && current.col > 0) {
+				let newRow = current.row;
+				if (
+					e.key === 'ArrowLeft' &&
+					current.col > 0 &&
+					newBoard[current.row][current.col - 1] !== true
+				) {
 					newCol--;
 				}
-				if (e.key === 'ArrowRight' && current.col < width - 1) {
+				if (
+					e.key === 'ArrowRight' &&
+					current.col < width - 1 &&
+					newBoard[current.row][current.col + 1] !== true
+				) {
 					newCol++;
 				}
+				if (
+					e.key === 'ArrowDown' &&
+					current.row < height - 1 &&
+					newBoard[current.row + 1][current.col] !== true
+				) {
+					newRow++;
+				}
 
-				newBoard[current.row][newCol] = true;
-				setCurrent({ ...current, col: newCol });
+				newBoard[newRow][newCol] = true;
+				setCurrent({ row: newRow, col: newCol });
 
 				return newBoard;
 			});
@@ -36,7 +51,7 @@ function App() {
 
 		document.addEventListener('keydown', handleKeyDown);
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [current]);
+	}, []);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -53,8 +68,17 @@ function App() {
 				) {
 					newBoard[current.row][current.col] = true;
 					setCurrent({ row: 0, col: 5 });
+
+					if (
+						newBoard[current.row][current.col] === true &&
+						current.row === 1
+					) {
+						alert('game over');
+						return;
+					}
 					return newBoard;
 				}
+
 				const newRow = current.row + 1;
 				newBoard[newRow][current.col] = true;
 				setCurrent({ row: newRow, col: current.col });
@@ -65,8 +89,6 @@ function App() {
 
 		return () => clearInterval(interval);
 	}, [current]);
-
-	console.log(board[19]);
 
 	return (
 		<div className='container'>
