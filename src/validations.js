@@ -1,6 +1,6 @@
 // do not validate positions which is part of the shape
 const checkIsShapePart = (shape, newI, newJ) =>
-  shape.some((cell) => cell.i === newI && cell.j === newJ);
+  shape.figure.some(({i , j}) => i === newI && j === newJ);
 
 export const validateBoard = (board) => {
   if (!Array.isArray(board)) {
@@ -15,15 +15,16 @@ export const validateBoard = (board) => {
 };
 
 export const validateShape = (shape) => {
-  if (!Array.isArray(shape)) {
+  if (!Array.isArray(shape.figure)) {
     throw new Error("Shape is not an array");
   }
 
-  const hasInvalidCell = shape.some(
-    (cell) =>
+  const hasInvalidCell = shape.figure.some(
+    (cell) =>{
       typeof cell !== "object" ||
       !Number.isFinite(cell.i) ||
       !Number.isFinite(cell.j)
+    }
   );
 
   if (hasInvalidCell) {
@@ -34,8 +35,8 @@ export const validateShape = (shape) => {
 };
 
 export const validateLeftMove = (board, shape) => {
-  shape.forEach(({ i, j }) => {
-    const isShapePart = checkIsShapePart(shape, i, j - 1);
+  shape.figure.forEach(({i , j}) => {
+    const isShapePart = checkIsShapePart(shape,i,j - 1);
 
     // if some part of the shape is in the first column or the left cell is already occupied
     if (!isShapePart && i >= 0 && (j === 0 || board[i][j - 1])) {
@@ -47,11 +48,11 @@ export const validateLeftMove = (board, shape) => {
 export const validateRightMove = (board, shape) => {
   const width = board[0].length;
 
-  shape.forEach(({ i, j }) => {
+  shape.figure.forEach(({ i,j }) => {
     const isShapePart = checkIsShapePart(shape, i, j + 1);
 
     // if some part of the shape is in the last column or the right cell is already occupied
-    if (!isShapePart && (j === width - 1 || board[i][j + 1])) {
+    if (!isShapePart && i >= 0 && (j === width - 1 || board[i][j + 1])) {
       throw new Error("Right move was failed");
     }
   });
@@ -60,7 +61,7 @@ export const validateRightMove = (board, shape) => {
 export const validateDownMove = (board, shape) => {
   const height = board.length;
 
-  shape.forEach(({ i, j }) => {
+  shape.figure.forEach(({ i,j }) => {
     const isShapePart = checkIsShapePart(shape, i + 1, j);
     // if some part of the shape is in the bottom or the bellow cell is already occupied
     // i + 1 >= 0 condition means cells already in the board or going to be displayed

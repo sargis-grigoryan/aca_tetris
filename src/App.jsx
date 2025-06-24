@@ -42,6 +42,17 @@ function App() {
           console.error(e)
         }
       }
+
+      if(key === "ArrowDown") {
+        try {
+          const {newBoard,newShape} = move(board,shape,DIRECTIONS.DOWN)
+          setBoard(newBoard)
+          setShape(newShape)
+        }
+        catch(e) {
+          console.error(e)
+        }
+      }
     
     };
 
@@ -60,7 +71,7 @@ function App() {
         setShape(newShape);
         setIsGameOver(false)
       } catch (e) {
-        const isFinished = shape.some(({i}) => i <= 0)
+        const isFinished = shape.figure.some(({i}) => i <= 0)
         if(!isFinished) {
           setShape(SHAPES[currentShapeRef.current])
           currentShapeRef.current = (currentShapeRef.current + 1) % SHAPES.length
@@ -82,13 +93,13 @@ function App() {
       {board.map((row) => (
         <div className="row">
           {row.map((cell) => (
-            <div className={`cell ${cell === true ? "marked" : ""}`}></div>
+            <div className={`cell`} style={{backgroundColor:cell ? cell : ""}}></div>
           ))}
         </div>
       ))}
     </div>
     <div className="">
-      78978797979797979797
+      <button>Reverse</button>
     </div>
     </div>
   );

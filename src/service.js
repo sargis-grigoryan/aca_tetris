@@ -14,22 +14,23 @@ export const move = (board, shape, direction) => {
   if (direction === DIRECTIONS.LEFT) {
     validateLeftMove(board, shape);
     const newBoard = board.map((row) => [...row]);
-    const newShape = [];
+    const newShape = {figure : []}
 
     // Clear mark from previous ceils
-    shape.forEach(({ i, j }) => {
-      if (i >= 0) {
-        newBoard[i][j] = false;
-      }
+    shape.figure.forEach(({i , j}) => {
+        if (i >= 0) {
+          newBoard[i][j] = false;
+        }
     });
 
     // Mark new ceils
-    shape.forEach(({ i, j }) => {
-      if (i >= 0 && j >= 1) {
-        newBoard[i][j - 1] = true;
-      }
-      newShape.push({ i, j: j - 1 });
-    });
+    shape.figure.forEach(({i , j}) => {
+        if (i >= 0 && j >= 1) {
+          newBoard[i][j - 1] = shape.color;
+        }
+        newShape.figure.push({ i, j: j - 1});
+        newShape.color = shape.color
+      })
 
     return { newBoard, newShape };
   }
@@ -39,18 +40,19 @@ export const move = (board, shape, direction) => {
     validateRightMove(board, shape);
 
     const newBoard = board.map((row) => [...row]);
-    const newShape = [];
+    const newShape = {figure : []}
     // Clear mark from previous ceils
-    shape.forEach(({i , j}) => {
-      if(i >= 0) newBoard[i][j] = false
+    shape.figure.forEach(({i,j}) => {
+        if(i >= 0) newBoard[i][j] = false
     })
 
      // Mark new ceils
-    shape.forEach(({i , j}) => {
-      if(i >= 0) {
-        newBoard[i][j + 1] = true
+    shape.figure.forEach(({i,j}) => {
+        if(i >= 0) {
+          newBoard[i][j + 1] = shape.color
       }
-      newShape.push({i,j : j + 1})
+        newShape.figure.push({i,j : j + 1})
+        newShape.color = shape.color
     })
 
     return { newBoard, newShape };
@@ -58,18 +60,19 @@ export const move = (board, shape, direction) => {
 
   if (direction === DIRECTIONS.DOWN) {
     const newBoard = board.map((row) => [...row]);
-    const newShape = [];
+    const newShape = {figure : []}
     validateDownMove(board, shape);
 
     // Clear mark from previous ceils
-    shape.forEach(({ i, j }) => {
-      if (i >= 0) newBoard[i][j] = false;
+    shape.figure.forEach(({ i , j }) => {
+        if (i >= 0) newBoard[i][j] = false;
     });
 
     // Mark new ceils
-    shape.forEach(({ i, j }) => {
-      if (i + 1 >= 0) newBoard[i + 1][j] = true;
-      newShape.push({ i: i + 1, j });
+    shape.figure.forEach(({ i,j}) => {
+        if (i + 1 >= 0) newBoard[i + 1][j] = shape.color;
+        newShape.figure.push({ i: i + 1, j });
+        newShape.color = shape.color
     });
 
     return { newBoard, newShape };
