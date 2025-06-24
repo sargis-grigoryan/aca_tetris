@@ -35,6 +35,12 @@ export const validateShape = (shape) => {
 };
 
 export const validateLeftMove = (board, shape) => {
+  if(shape.figure.every(({i}) => {
+    return i < 0
+  })) {
+    throw new Error("No cells in the board")
+  }
+
   shape.figure.forEach(({i , j}) => {
     const isShapePart = checkIsShapePart(shape,i,j - 1);
 
@@ -47,6 +53,12 @@ export const validateLeftMove = (board, shape) => {
 
 export const validateRightMove = (board, shape) => {
   const width = board[0].length;
+
+  if(shape.figure.every(({i}) => {
+    return i < 0
+  })) {
+    throw new Error("No cells in the board")
+  }
 
   shape.figure.forEach(({ i,j }) => {
     const isShapePart = checkIsShapePart(shape, i, j + 1);
