@@ -1,87 +1,52 @@
-import { DIRECTIONS } from "./constants";
+import { DIRECTIONS } from './constants';
 import {
-  validateBoard,
-  validateDownMove,
-  validateLeftMove,
-  validateRightMove,
-  validateShape,
-} from "./validations";
+	validateBoard,
+	validateDownMove,
+	validateLeftMove,
+	validateRightMove,
+	validateShape,
+} from './validations';
 
 export const move = (board, shape, direction) => {
-  validateBoard(board);
-  validateShape(shape);
+	validateBoard(board);
+	validateShape(shape);
 
-  if (direction === DIRECTIONS.LEFT) {
-    validateLeftMove(board, shape);
+	const newBoard = board.map(row => [...row]);
+	const newShape = [];
 
-    const newBoard = [...board];
-    const newShape = [];
+	if (direction === DIRECTIONS.LEFT) {
+		validateLeftMove(board, shape);
 
-    shape.forEach(({ i, j }) => {
-      // modify board if the cell is visible
-      if (i >= 0) {
-        // clear mark from previous cell
-        newBoard[i][j] = false;
-        // mark new cell
-        newBoard[i][j - 1] = true;
-      }
+		shape.forEach(({ i, j }) => {
+			if (i >= 0) {
+				newBoard[i][j] = false;
+			}
+			newShape.push({ i, j: j - 1 });
+		});
+	}
+	if (direction === DIRECTIONS.RIGHT) {
+		validateRightMove(board, shape);
 
-      newShape.push({
-        i: i,
-        j: j - 1,
-      });
-    });
+		shape.forEach(({ i, j }) => {
+			if (i >= 0) {
+				newBoard[i][j] = false;
+			}
+			newShape.push({ i, j: j + 1 });
+		});
+	}
+	if (direction === DIRECTIONS.DOWN) {
+		validateDownMove(board, shape);
 
-    return { newBoard, newShape };
-  }
+		shape.forEach(({ i, j }) => {
+			newShape.push({ i: i + 1, j });
+		});
+	}
 
-  if (direction === DIRECTIONS.RIGHT) {
-    validateRightMove(board, shape);
+	newShape.forEach(({ i, j }) => {
+		if (i >= 0 && i < newBoard.length && j >= 0 && j < newBoard[0].length) {
+			newBoard[i][j] = true;
+		}
+	});
 
-    const newBoard = [...board];
-    const newShape = [];
-
-    shape.forEach(({ i, j }) => {
-      // modify board if the cell is visible
-      if (i >= 0) {
-        // clear mark from previous cell
-        newBoard[i][j] = false;
-        // mark new cell
-        newBoard[i][j + 1] = true;
-      }
-
-      newShape.push({
-        i: i,
-        j: j + 1,
-      });
-    });
-
-    return { newBoard, newShape };
-  }
-
-  if (direction === DIRECTIONS.DOWN) {
-    validateDownMove(board, shape);
-
-    const newBoard = [...board];
-    const newShape = [];
-
-    shape.forEach(({ i, j }) => {
-      if (i >= 0) {
-        // clear mark from previous cell
-        newBoard[i][j] = false;
-      }
-
-      if (i + 1 >= 0) {
-        // mark new cell
-        newBoard[i + 1][j] = true;
-      }
-
-      newShape.push({
-        i: i + 1,
-        j: j,
-      });
-    });
-
-    return { newBoard, newShape };
-  }
+	return { newBoard, newShape };
 };
