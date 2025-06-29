@@ -66,10 +66,10 @@ export const move = (board, shape, direction) => {
     // Clear mark from previous ceils
     shape.figure.forEach(({ i , j }) => {
         if (i >= 0) newBoard[i][j] = false;
-    });
+    }); 
 
     // Mark new ceils
-    shape.figure.forEach(({ i,j}) => {
+    shape.figure.forEach(({i,j}) => {
         if (i + 1 >= 0) newBoard[i + 1][j] = shape.color;
         newShape.figure.push({ i: i + 1, j });
         newShape.color = shape.color

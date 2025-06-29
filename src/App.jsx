@@ -57,7 +57,6 @@ function App() {
     };
 
     document.addEventListener("keydown", eventHandler);
-
     return () => {
       document.removeEventListener("keydown", eventHandler);
     };
@@ -87,6 +86,11 @@ function App() {
     return () => clearTimeout(timer)
   }, [board,shape]);
 
+
+  function reverseShape() {
+   
+  }
+
   return (
     <div style={{display:"flex"}}>
     <div className="container">
@@ -99,7 +103,7 @@ function App() {
       ))}
     </div>
     <div className="">
-      <button>Reverse</button>
+      <button onClick={reverseShape}>Reverse</button>
     </div>
     </div>
   );
