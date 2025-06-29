@@ -21,3 +21,30 @@
     }
   }
 }
+
+.preview-container {
+  position: absolute;
+
+  .shape {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: fit-content;
+    margin-top: 10px;
+
+    .shape-row {
+      display: flex;
+      width: fit-content;
+
+      .shape-cell {
+        width: 20px;
+        height: 20px;
+
+        &.marked {
+          background-color: #fb4b4b;
+          border: 1px solid gray;
+        }
+      }
+    }
+  }
+}

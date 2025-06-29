@@ -2,31 +2,20 @@ import { useEffect, useState } from "react";
 import "./App.scss";
 import { move } from "./service";
 import { DIRECTIONS } from "./constants";
+import { shapes, generateRandomShape } from "./shapes";
+import ShapePreview from "./Preview";
 
 const width = 10;
 const height = 25;
-const initialShape = [
-  {
-    i: -4,
-    j: 5,
-  },
-  {
-    i: -3,
-    j: 5,
-  },
-  {
-    i: -2,
-    j: 5,
-  },
-  {
-    i: -1,
-    j: 5,
-  },
-];
+
 
 function App() {
+  const initialShape = shapes[generateRandomShape(shapes)];
+  const initialNextShape = generateRandomShape(shapes);
+  
   const [isGameOver, setIsGameOver] = useState(false);
   const [shape, setShape] = useState(initialShape);
+  const [nextShape, setNextShape] = useState(initialNextShape);
   const [goDownSteps, setGoDownSteps] = useState(0);
 
   const [board, setBoard] = useState(() =>
@@ -67,9 +56,10 @@ function App() {
       if (unfinishedShape) {
         setIsGameOver(true);
       } else {
+        setNextShape(generateRandomShape(shapes));
         const { newBoard, newShape } = move(
           board,
-          initialShape,
+          shapes[nextShape],
           DIRECTIONS.DOWN
         );
         setBoard(newBoard);
@@ -92,6 +82,8 @@ function App() {
   }, [goDownSteps, isGameOver]);
 
   return (
+    <>
+    <ShapePreview shape={nextShape} />
     <div className="container">
       {board.map((row) => (
         <div className="row">
@@ -101,6 +93,7 @@ function App() {
         </div>
       ))}
     </div>
+    </>
   );
 }
 
