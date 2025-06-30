@@ -52,7 +52,7 @@ function App() {
       setBoard(newBoard);
       setShape(newShape);
     } catch (e) {
-      const unfinishedShape = shape.some(({ i }) => i < 0);
+      const unfinishedShape = shape.some(({ i }) => i <= 0);
       if (unfinishedShape) {
         setIsGameOver(true);
       } else {
