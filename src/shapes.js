@@ -6,3 +6,8 @@ export const SHAPES = [
   {figure:[{i: -2, j: 4 },{i: -1 ,j : 4},{i : -1, j :5},{i: -1, j: 6 }],color:"orange"},
   {figure:[{i: -3, j: 5 },{i: -2 ,j : 5},{i : -2, j :4},{i: -1, j: 4 }],color:"yellow"}
 ];
+
+export default function getRandomShape(){
+    const shapeInd = Math.floor(Math.random() * (SHAPES.length ));
+    return SHAPES[shapeInd]
+}
