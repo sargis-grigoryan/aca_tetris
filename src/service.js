@@ -13,66 +13,81 @@ export const move = (board, shape, direction) => {
 
   if (direction === DIRECTIONS.LEFT) {
     validateLeftMove(board, shape);
-    const newBoard = board.map((row) => [...row]);
-    const newShape = {figure : []}
 
-    // Clear mark from previous ceils
-    shape.figure.forEach(({i , j}) => {
-        if (i >= 0) {
-          newBoard[i][j] = false;
-        }
+    const newBoard = [...board];
+    const newShape = [];
+
+    shape.forEach(({ i, j }) => {
+      // modify board if the cell is visible
+      if (i >= 0) {
+        // clear mark from previous cell
+        newBoard[i] = [...board[i]];
+        newBoard[i][j] = false;
+        // mark new cell
+        newBoard[i][j - 1] = true;
+      }
+
+      newShape.push({
+        i: i,
+        j: j - 1,
+      });
     });
-
-    // Mark new ceils
-    shape.figure.forEach(({i , j}) => {
-        if (i >= 0 && j >= 1) {
-          newBoard[i][j - 1] = shape.color;
-        }
-        newShape.figure.push({ i, j: j - 1});
-        newShape.color = shape.color
-      })
 
     return { newBoard, newShape };
   }
-  
 
   if (direction === DIRECTIONS.RIGHT) {
     validateRightMove(board, shape);
 
-    const newBoard = board.map((row) => [...row]);
-    const newShape = {figure : []}
-    // Clear mark from previous ceils
-    shape.figure.forEach(({i,j}) => {
-        if(i >= 0) newBoard[i][j] = false
-    })
+    const newBoard = [...board];
+    const newShape = [];
 
-     // Mark new ceils
-    shape.figure.forEach(({i,j}) => {
-        if(i >= 0) {
-          newBoard[i][j + 1] = shape.color
+    shape.forEach(({ i, j }) => {
+      // modify board if the cell is visible
+      if (i >= 0) {
+        // clear mark from previous cell
+        newBoard[i] = [...board[i]];
+        newBoard[i][j] = false;
+        // mark new cell
+        newBoard[i][j + 1] = true;
       }
-        newShape.figure.push({i,j : j + 1})
-        newShape.color = shape.color
-    })
+
+      newShape.push({
+        i: i,
+        j: j + 1,
+      });
+    });
 
     return { newBoard, newShape };
   }
 
   if (direction === DIRECTIONS.DOWN) {
-    const newBoard = board.map((row) => [...row]);
-    const newShape = {figure : []}
     validateDownMove(board, shape);
 
-    // Clear mark from previous ceils
-    shape.figure.forEach(({ i , j }) => {
-        if (i >= 0) newBoard[i][j] = false;
-    }); 
+    const newBoard = [...board];
+    const newShape = [];
+    [...shape]
+      .sort((a, b) => b.i - a.i)
+      .forEach(({ i, j }) => {
+        if (i >= 0) {
+          // clear mark from previous cell
+          newBoard[i] = [...board[i]];
+          newBoard[i][j] = false;
+        }
+      });
 
-    // Mark new ceils
-    shape.figure.forEach(({i,j}) => {
-        if (i + 1 >= 0) newBoard[i + 1][j] = shape.color;
-        newShape.figure.push({ i: i + 1, j });
-        newShape.color = shape.color
+    const sortedShape = [...shape].sort((a, b) => b.i - a.i);
+
+    sortedShape.forEach(({ i, j }) => {
+      if (i >= 0 && i < board.length) {
+        newBoard[i][j] = false;
+      }
+
+      if (i + 1 >= 0 && i + 1 < board.length) {
+        newBoard[i + 1][j] = true;
+      }
+
+      newShape.push({ i: i + 1, j });
     });
 
     return { newBoard, newShape };

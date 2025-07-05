@@ -10,6 +10,7 @@ const height = 20;
 
 function App() {
   const [isGameOver, setIsGameOver] = useState(false);
+  const [downCount,setDownCount] = useState(0)
   const currentShapeRef = useRef(1)
   const [shape, setShape] = useState(SHAPES[0]);
 
@@ -68,7 +69,7 @@ function App() {
         const { newBoard, newShape } = move(board, shape, DIRECTIONS.DOWN);
         setBoard(newBoard);
         setShape(newShape);
-        setIsGameOver(false)
+    
       } catch (e) {
         const isFinished = shape.figure.some(({i}) => i < 0)
         if(!isFinished) {
@@ -84,7 +85,7 @@ function App() {
     },500)
 
     return () => clearTimeout(timer)
-  },[board,shape]);
+  },[downCount]);
 
 
   function reverseShape() {
