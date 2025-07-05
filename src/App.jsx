@@ -70,7 +70,7 @@ function App() {
         setShape(newShape);
         setIsGameOver(false)
       } catch (e) {
-        const isFinished = shape.figure.some(({i}) => i <= 0)
+        const isFinished = shape.figure.some(({i}) => i < 0)
         if(!isFinished) {
           setShape(SHAPES[currentShapeRef.current])
           currentShapeRef.current = (currentShapeRef.current + 1) % SHAPES.length
@@ -84,7 +84,7 @@ function App() {
     },500)
 
     return () => clearTimeout(timer)
-  }, [board,shape]);
+  },[board,shape]);
 
 
   function reverseShape() {
