@@ -61,9 +61,25 @@ export const move = (board, shape, direction) => {
     return { newBoard, newShape };
   }
 
+  // {
+  //     i: -1,
+  //     j: 5,
+  //   },
+  //   {
+  //     i: -1,
+  //     j: 4,
+  //   },
+  //   {
+  //     i: -2,
+  //     j: 5,
+  //   },
+  //   {
+  //     i: -2,
+  //     j: 4,
+  //   }
+  
   if (direction === DIRECTIONS.DOWN) {
     validateDownMove(board, shape);
-
     const newBoard = [...board];
     const newShape = [];
 
@@ -71,12 +87,12 @@ export const move = (board, shape, direction) => {
 
     sortedShape.forEach(({ i, j }) => {
       if (i >= 0 && i < board.length) {
-        newBoard[i] = [...board[i]];
+        newBoard[i] = [...newBoard[i]];
         newBoard[i][j] = false;
       }
 
       if (i + 1 >= 0 && i + 1 < board.length) {
-        newBoard[i + 1] = [...board[i + 1]];
+        newBoard[i + 1] = [...newBoard[i + 1]];
         newBoard[i + 1][j] = true;
       }
 
