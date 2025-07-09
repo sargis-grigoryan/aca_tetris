@@ -14,6 +14,8 @@ const initialShape = [
 ];
 
 function App() {
+	const [gameOver, setGameOver] = useState(false);
+
 	const [shape, setShape] = useState(initialShape);
 	const [board, setBoard] = useState(
 		Array(height)
@@ -66,6 +68,8 @@ function App() {
 
 		return () => clearInterval(interval);
 	}, [board]);
+
+	console.log(board);
 
 	const isCellOccupied = (rowIdx, colIdx) => {
 		const inShape = shape.some(({ i, j }) => i === rowIdx && j === colIdx);
