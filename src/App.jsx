@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './App.scss';
 import { move } from './service';
 import { DIRECTIONS } from './constants';
@@ -7,86 +7,101 @@ const width = 10;
 const height = 20;
 
 const initialShape = [
-	{ i: -4, j: 5 },
 	{ i: -3, j: 5 },
 	{ i: -2, j: 5 },
 	{ i: -1, j: 5 },
+	{ i: 0, j: 5 },
 ];
 
-function App() {
-	const [gameOver, setGameOver] = useState(false);
+function getMergedBoard(board, shape) {
+	const merged = board.map(row => [...row]);
+	shape.forEach(({ i, j }) => {
+		if (i >= 0 && i < height && j >= 0 && j < width) {
+			merged[i][j] = true;
+		}
+	});
+	return merged;
+}
 
+function App() {
+	const [isGameOver, setIsGameOver] = useState(false);
 	const [shape, setShape] = useState(initialShape);
-	const [board, setBoard] = useState(
+	const [board, setBoard] = useState(() =>
 		Array(height)
 			.fill(null)
 			.map(() => Array(width).fill(false))
 	);
 
-	useEffect(() => {
-		const eventHandler = ({ key }) => {
-			let result = null;
-
-			if (key === 'ArrowLeft') {
-				result = move(board, shape, DIRECTIONS.LEFT);
-			} else if (key === 'ArrowRight') {
-				result = move(board, shape, DIRECTIONS.RIGHT);
-			} else if (key === 'ArrowDown') {
-				result = move(board, shape, DIRECTIONS.DOWN);
-			}
-
-			if (result) {
-				setShape(result.newShape);
-			}
-		};
-
-		document.addEventListener('keydown', eventHandler);
-
-		return () => {
-			document.removeEventListener('keydown', eventHandler);
-		};
-	}, [board, shape]);
+	const shapeRef = useRef(shape);
+	const boardRef = useRef(board);
+	const timeoutID = useRef(null);
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			setShape(prevShape => {
-				try {
-					const { newShape } = move(board, prevShape, DIRECTIONS.DOWN);
-					return newShape;
-				} catch (e) {
-					const newBoard = board.map(row => [...row]);
-					prevShape.forEach(({ i, j }) => {
-						if (i >= 0 && i < height && j >= 0 && j < width) {
-							newBoard[i][j] = true;
-						}
-					});
-					setBoard(newBoard);
-					return initialShape;
+		shapeRef.current = shape;
+		boardRef.current = board;
+	}, [shape, board]);
+
+	useEffect(() => {
+		const tick = () => {
+			try {
+				const { newBoard, newShape } = move(
+					boardRef.current,
+					shapeRef.current,
+					DIRECTIONS.DOWN
+				);
+
+				setBoard(newBoard);
+				setShape(newShape);
+				timeoutID.current = setTimeout(tick, 200);
+			} catch (e) {
+				const updatedBoard = boardRef.current.map(row => [...row]);
+
+				shapeRef.current.forEach(({ i, j }) => {
+					if (i >= 0 && i < height && j >= 0 && j < width) {
+						updatedBoard[i][j] = true;
+					}
+				});
+
+				const nextShape = [
+					{ i: 0, j: 4 },
+					{ i: 0, j: 5 },
+					{ i: 0, j: 6 },
+				];
+				const blocked = nextShape.some(({ i, j }) => {
+					if (i < 0) return false;
+					return updatedBoard[i]?.[j];
+				});
+				if (blocked) {
+					console.log('Game over!');
+					setIsGameOver(true);
+					clearTimeout(timeoutID.current);
+					return;
 				}
-			});
-		}, 500);
 
-		return () => clearInterval(interval);
-	}, [board]);
+				setBoard(updatedBoard);
+				boardRef.current = updatedBoard;
 
-	console.log(board);
+				setShape(nextShape);
+				shapeRef.current = nextShape;
 
-	const isCellOccupied = (rowIdx, colIdx) => {
-		const inShape = shape.some(({ i, j }) => i === rowIdx && j === colIdx);
-		return board[rowIdx][colIdx] || inShape;
-	};
+				timeoutID.current = setTimeout(tick, 100);
+			}
+		};
+
+		timeoutID.current = setTimeout(tick, 100);
+		return () => clearTimeout(timeoutID.current);
+	}, []);
+
+	const mergedBoard = getMergedBoard(board, shape);
 
 	return (
 		<div className='container'>
-			{board.map((row, rowIdx) => (
-				<div key={rowIdx} className='row'>
-					{row.map((_, colIdx) => (
-						<div
-							key={colIdx}
-							className={`cell ${
-								isCellOccupied(rowIdx, colIdx) ? 'marked' : ''
-							}`}
-						></div>
+			{isGameOver && <div className='game-over'>Game Over</div>}
+
+			{mergedBoard.map((row, i) => (
+				<div className='row' key={i}>
+					{row.map((cell, j) => (
+						<div className={`cell ${cell ? 'marked' : ''}`} key={j}></div>
 					))}
 				</div>
 			))}
