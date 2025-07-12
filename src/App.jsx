@@ -2,22 +2,17 @@ import { useEffect, useState, useRef } from 'react';
 import './App.scss';
 import { move } from './service';
 import { DIRECTIONS } from './constants';
+import getRandomShape from './shapes';
+import getRandomColor from './colors';
 
 const width = 10;
 const height = 20;
 
-const initialShape = [
-	{ i: -3, j: 5 },
-	{ i: -2, j: 5 },
-	{ i: -1, j: 5 },
-	{ i: 0, j: 5 },
-];
-
-function getMergedBoard(board, shape) {
+function getMergedBoard(board, shape, color) {
 	const merged = board.map(row => [...row]);
 	shape.forEach(({ i, j }) => {
 		if (i >= 0 && i < height && j >= 0 && j < width) {
-			merged[i][j] = true;
+			merged[i][j] = color;
 		}
 	});
 	return merged;
@@ -25,7 +20,12 @@ function getMergedBoard(board, shape) {
 
 function App() {
 	const [isGameOver, setIsGameOver] = useState(false);
-	const [shape, setShape] = useState(initialShape);
+	const [shapeState, setShapeState] = useState({
+		shape: getRandomShape(),
+		color: getRandomColor(),
+	});
+	const [shape, setShape] = useState(shapeState.shape);
+
 	const [board, setBoard] = useState(() =>
 		Array(height)
 			.fill(null)
@@ -47,7 +47,8 @@ function App() {
 				const { newBoard, newShape } = move(
 					boardRef.current,
 					shapeRef.current,
-					DIRECTIONS.DOWN
+					DIRECTIONS.DOWN,
+					shapeState.color
 				);
 
 				setBoard(newBoard);
@@ -57,16 +58,14 @@ function App() {
 				const updatedBoard = boardRef.current.map(row => [...row]);
 
 				shapeRef.current.forEach(({ i, j }) => {
+					console.log(shapeState.color);
+
 					if (i >= 0 && i < height && j >= 0 && j < width) {
-						updatedBoard[i][j] = true;
+						updatedBoard[i][j] = shapeState.color;
 					}
 				});
 
-				const nextShape = [
-					{ i: 0, j: 4 },
-					{ i: 0, j: 5 },
-					{ i: 0, j: 6 },
-				];
+				const nextShape = getRandomShape();
 				const blocked = nextShape.some(({ i, j }) => {
 					if (i < 0) return false;
 					return updatedBoard[i]?.[j];
@@ -77,8 +76,12 @@ function App() {
 					clearTimeout(timeoutID.current);
 					return;
 				}
-
+				setShapeState({
+					shape: getRandomShape(),
+					color: getRandomColor(),
+				});
 				setBoard(updatedBoard);
+
 				boardRef.current = updatedBoard;
 
 				setShape(nextShape);
@@ -90,9 +93,9 @@ function App() {
 
 		timeoutID.current = setTimeout(tick, 100);
 		return () => clearTimeout(timeoutID.current);
-	}, []);
+	}, [shapeState.color]);
 
-	const mergedBoard = getMergedBoard(board, shape);
+	const mergedBoard = getMergedBoard(board, shape, shapeState.color);
 
 	return (
 		<div className='container'>
@@ -101,7 +104,11 @@ function App() {
 			{mergedBoard.map((row, i) => (
 				<div className='row' key={i}>
 					{row.map((cell, j) => (
-						<div className={`cell ${cell ? 'marked' : ''}`} key={j}></div>
+						<div
+							className='cell'
+							style={{ backgroundColor: cell || 'transparent' }}
+							key={j}
+						/>
 					))}
 				</div>
 			))}

@@ -7,7 +7,7 @@ import {
 	validateShape,
 } from './validations';
 
-export const move = (board, shape, direction) => {
+export const move = (board, shape, direction, color) => {
 	validateBoard(board);
 	validateShape(shape);
 
@@ -23,7 +23,7 @@ export const move = (board, shape, direction) => {
 				// clear mark from previous cell
 				newBoard[i][j] = false;
 				// mark new cell
-				newBoard[i][j - 1] = true;
+				newBoard[i][j - 1] = color;
 			}
 
 			newShape.push({
@@ -47,7 +47,7 @@ export const move = (board, shape, direction) => {
 				// clear mark from previous cell
 				newBoard[i][j] = false;
 				// mark new cell
-				newBoard[i][j + 1] = true;
+				newBoard[i][j + 1] = color;
 			}
 
 			newShape.push({
@@ -73,7 +73,7 @@ export const move = (board, shape, direction) => {
 
 			if (i + 1 >= 0) {
 				// mark new cell
-				newBoard[i + 1][j] = true;
+				newBoard[i + 1][j] = color;
 			}
 
 			newShape.push({
