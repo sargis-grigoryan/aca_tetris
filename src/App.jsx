@@ -4,7 +4,7 @@ import { move } from "./service";
 import { DIRECTIONS } from "./constants";
 
 const width = 10;
-const height = 20;
+const height = 12;
 
 const initialShape = [
   { i: -3, j: 5 },
@@ -44,13 +44,19 @@ function App() {
       if (unfinishedShape) {
         setIsGameOver(true);
       } else {
-        const { newBoard, newShape } = move(
-          board,
-          initialShape,
-          DIRECTIONS.DOWN
+          if(!board[0][initialShape.at(-1).j]) {
+            const { newBoard, newShape } = move(
+            board,
+            initialShape,
+            DIRECTIONS.DOWN
         );
         setBoard(newBoard);
         setShape(newShape);
+
+      }
+      else {
+        setIsGameOver(true)
+      }
       }
     }
   };
