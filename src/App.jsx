@@ -40,7 +40,7 @@ function App() {
       setBoard(newBoard);
       setShape(newShape);
     } catch {
-      const unfinishedShape = shape.some(({ i }) => i < 0);
+      const unfinishedShape = shape.some(({ i }) => i <= 0);
       if (unfinishedShape) {
         setIsGameOver(true);
       } else {
