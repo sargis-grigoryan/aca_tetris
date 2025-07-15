@@ -11,26 +11,28 @@ export const move = (board, shape, direction) => {
   validateBoard(board);
   validateShape(shape);
 
+  const newBoard = board.map((row) => [...row]);
+  const newShape = [];
+
+  const clearShapeFromBoard = () => {
+    shape.forEach(({ i, j }) => {
+      if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
+        newBoard[i][j] = false;
+      }
+    });
+  };
+
   if (direction === DIRECTIONS.LEFT) {
     validateLeftMove(board, shape);
 
-    const newBoard = [...board];
-    const newShape = [];
+    clearShapeFromBoard();
 
     shape.forEach(({ i, j }) => {
-      // modify board if the cell is visible
-      if (i >= 0) {
-        // clear mark from previous cell
-        newBoard[i] = [...board[i]];
-        newBoard[i][j] = false;
-        // mark new cell
-        newBoard[i][j - 1] = true;
+      const newJ = j - 1;
+      if (i >= 0 && newJ >= 0) {
+        newBoard[i][newJ] = true;
       }
-
-      newShape.push({
-        i: i,
-        j: j - 1,
-      });
+      newShape.push({ i, j: newJ });
     });
 
     return { newBoard, newShape };
@@ -39,23 +41,14 @@ export const move = (board, shape, direction) => {
   if (direction === DIRECTIONS.RIGHT) {
     validateRightMove(board, shape);
 
-    const newBoard = [...board];
-    const newShape = [];
+    clearShapeFromBoard();
 
     shape.forEach(({ i, j }) => {
-      // modify board if the cell is visible
-      if (i >= 0) {
-        // clear mark from previous cell
-        newBoard[i] = [...board[i]];
-        newBoard[i][j] = false;
-        // mark new cell
-        newBoard[i][j + 1] = true;
+      const newJ = j + 1;
+      if (i >= 0 && newJ < board[0].length) {
+        newBoard[i][newJ] = true;
       }
-
-      newShape.push({
-        i: i,
-        j: j + 1,
-      });
+      newShape.push({ i, j: newJ });
     });
 
     return { newBoard, newShape };
@@ -64,25 +57,20 @@ export const move = (board, shape, direction) => {
   if (direction === DIRECTIONS.DOWN) {
     validateDownMove(board, shape);
 
-    const newBoard = [...board];
-    const newShape = [];
-
     const sortedShape = [...shape].sort((a, b) => b.i - a.i);
 
+    clearShapeFromBoard();
+
     sortedShape.forEach(({ i, j }) => {
-      if (i >= 0 && i < board.length) {
-        newBoard[i] = [...board[i]];
-        newBoard[i][j] = false;
+      const newI = i + 1;
+      if (newI >= 0 && newI < board.length) {
+        newBoard[newI][j] = true;
       }
-
-      if (i + 1 >= 0 && i + 1 < board.length) {
-        newBoard[i + 1] = [...board[i + 1]];
-        newBoard[i + 1][j] = true;
-      }
-
-      newShape.push({ i: i + 1, j });
+      newShape.push({ i: newI, j });
     });
 
     return { newBoard, newShape };
   }
+
+  throw new Error("Unknown move direction");
 };
