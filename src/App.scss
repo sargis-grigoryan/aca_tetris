@@ -7,7 +7,6 @@
   margin: auto;
   position: relative;
 
-  
   .game-over {
     position: absolute;
     top: 40%;
@@ -26,15 +25,40 @@
   .row {
     display: flex;
     width: fit-content;
-
-    .cell {
-      border: 1px solid gray;
-      width: 30px;
-      height: 30px;
-
-      &.marked {
-        background-color: #21e62b;
-      }
-    }
   }
 }
+
+.cell {
+  border: 1px solid gray;
+  width: 30px;
+  height: 30px;
+
+  &.cyan {
+    background-color: cyan;
+  }
+
+  &.yellow {
+    background-color: yellow;
+  }
+
+  &.purple {
+    background-color: purple;
+  }
+
+  &.orange {
+    background-color: orange;
+  }
+
+  &.blue {
+    background-color: blue;
+  }
+
+  &.green {
+    background-color: green;
+  }
+
+  &.red {
+    background-color: red;
+  }
+}
+

@@ -27,12 +27,12 @@ export const move = (board, shape, direction) => {
 
     clearShapeFromBoard();
 
-    shape.forEach(({ i, j }) => {
+    shape.forEach(({ i, j, color }) => {
       const newJ = j - 1;
       if (i >= 0 && newJ >= 0) {
-        newBoard[i][newJ] = true;
+        newBoard[i][newJ] = color;
       }
-      newShape.push({ i, j: newJ });
+      newShape.push({ i, j: newJ, color });
     });
 
     return { newBoard, newShape };
@@ -43,12 +43,12 @@ export const move = (board, shape, direction) => {
 
     clearShapeFromBoard();
 
-    shape.forEach(({ i, j }) => {
+    shape.forEach(({ i, j, color }) => {
       const newJ = j + 1;
       if (i >= 0 && newJ < board[0].length) {
-        newBoard[i][newJ] = true;
+        newBoard[i][newJ] = color;
       }
-      newShape.push({ i, j: newJ });
+      newShape.push({ i, j: newJ, color });
     });
 
     return { newBoard, newShape };
@@ -61,12 +61,12 @@ export const move = (board, shape, direction) => {
 
     clearShapeFromBoard();
 
-    sortedShape.forEach(({ i, j }) => {
+    sortedShape.forEach(({ i, j, color }) => {
       const newI = i + 1;
       if (newI >= 0 && newI < board.length) {
-        newBoard[newI][j] = true;
+        newBoard[newI][j] = color;
       }
-      newShape.push({ i: newI, j });
+      newShape.push({ i: newI, j, color });
     });
 
     return { newBoard, newShape };
@@ -74,3 +74,4 @@ export const move = (board, shape, direction) => {
 
   throw new Error("Unknown move direction");
 };
+

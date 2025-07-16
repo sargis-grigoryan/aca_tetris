@@ -10,15 +10,21 @@ const height = 20;
 function getRandomShape() {
   const shapeKeys = Object.keys(SHAPES);
   const randomKey = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
-  return SHAPES[randomKey];
+  const shapeData = SHAPES[randomKey];
+  return shapeData.blocks.map(({ i, j }) => ({
+    i,
+    j,
+    color: shapeData.color,
+  }));
 }
+
 
 
 function getMergedBoard(board, shape) {
   const merged = board.map((row) => [...row]);
-  shape.forEach(({ i, j }) => {
+  shape.forEach(({ i, j, color }) => {
     if (i >= 0 && i < height && j >= 0 && j < width) {
-      merged[i][j] = true;
+      merged[i][j] = color;
     }
   });
   return merged;
@@ -35,32 +41,49 @@ function App() {
       .map(() => Array(width).fill(false))
   );
 
-  const moveDown = () => {
-    try {
-      const { newBoard, newShape } = move(board, shape, DIRECTIONS.DOWN);
-      setBoard(newBoard);
-      setShape(newShape);
-    } catch {
-      const unfinishedShape = shape.some(({ i }) => i < 0);
-      if (unfinishedShape) {
-        setIsGameOver(true);
-      } else {
-        try {
-          const newShapeRandom = getRandomShape();
+  function clearFullLines(board) {
+  const width = board[0].length;
+  const newBoard = board.filter(row => row.some(cell => !cell));
+  const linesCleared = board.length - newBoard.length;
 
-          const { newBoard, newShape } = move(
-            board,
-            newShapeRandom,
-            DIRECTIONS.DOWN
+  const emptyRows = Array(linesCleared)
+    .fill(null)
+    .map(() => Array(width).fill(false));
+
+  return [...emptyRows, ...newBoard];
+}
+
+
+const moveDown = () => {
+  try {
+    const { newBoard, newShape } = move(board, shape, DIRECTIONS.DOWN);
+    setBoard(newBoard);
+    setShape(newShape);
+  } catch {
+    const unfinishedShape = shape.some(({ i }) => i < 0);
+    if (unfinishedShape) {
+      setIsGameOver(true);
+    } else {
+      try {
+        const newShapeRandom = getRandomShape();
+
+        const clearedBoard = clearFullLines(board);
+
+        const { newBoard, newShape } = move(
+          clearedBoard,
+          newShapeRandom,
+          DIRECTIONS.DOWN
         );
-          setBoard(newBoard);
-          setShape(newShape);
-        } catch {
-          setIsGameOver(true);
-        }
+
+        setBoard(newBoard);
+        setShape(newShape);
+      } catch {
+        setIsGameOver(true);
       }
     }
-  };
+  }
+};
+
 
   useEffect(() => {
     if (isGameOver) {
@@ -109,7 +132,7 @@ useEffect(() => {
       {mergedBoard.map((row, i) => (
         <div className="row" key={i}>
           {row.map((cell, j) => (
-            <div className={`cell ${cell ? "marked" : ""}`} key={j}></div>
+            <div className={`cell ${cell ? cell : ""}`} key={j}></div>
           ))}
         </div>
       ))}
