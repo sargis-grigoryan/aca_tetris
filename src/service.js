@@ -7,6 +7,14 @@ import {
   validateShape,
 } from "./validations";
 
+const clearShapeFromBoard = (board, shape) => {
+  shape.forEach(({ i, j }) => {
+    if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
+      board[i][j] = false;
+    }
+  });
+};
+
 export const move = (board, shape, direction) => {
   validateBoard(board);
   validateShape(shape);
@@ -14,18 +22,9 @@ export const move = (board, shape, direction) => {
   const newBoard = board.map((row) => [...row]);
   const newShape = [];
 
-  const clearShapeFromBoard = () => {
-    shape.forEach(({ i, j }) => {
-      if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
-        newBoard[i][j] = false;
-      }
-    });
-  };
-
   if (direction === DIRECTIONS.LEFT) {
     validateLeftMove(board, shape);
-
-    clearShapeFromBoard();
+    clearShapeFromBoard(newBoard, shape);
 
     shape.forEach(({ i, j, color }) => {
       const newJ = j - 1;
@@ -40,8 +39,7 @@ export const move = (board, shape, direction) => {
 
   if (direction === DIRECTIONS.RIGHT) {
     validateRightMove(board, shape);
-
-    clearShapeFromBoard();
+    clearShapeFromBoard(newBoard, shape);
 
     shape.forEach(({ i, j, color }) => {
       const newJ = j + 1;
@@ -56,10 +54,9 @@ export const move = (board, shape, direction) => {
 
   if (direction === DIRECTIONS.DOWN) {
     validateDownMove(board, shape);
+    clearShapeFromBoard(newBoard, shape);
 
     const sortedShape = [...shape].sort((a, b) => b.i - a.i);
-
-    clearShapeFromBoard();
 
     sortedShape.forEach(({ i, j, color }) => {
       const newI = i + 1;
@@ -74,4 +71,5 @@ export const move = (board, shape, direction) => {
 
   throw new Error("Unknown move direction");
 };
+
 

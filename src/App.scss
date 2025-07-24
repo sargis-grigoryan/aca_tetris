@@ -177,4 +177,32 @@ body {
   }
 }
 
+.next-shape {
+  margin-top: 1rem;
 
+  .mini-board {
+    display: grid;
+    grid-template-rows: repeat(4, 1rem);
+    gap: 2px;
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(4, 1rem);
+      gap: 2px;
+
+      .cell {
+        width: 1rem;
+        height: 1rem;
+        background-color: #eee;
+
+        &.cyan { background: cyan; }
+        &.yellow { background: yellow; }
+        &.purple { background: purple; }
+        &.orange { background: orange; }
+        &.blue { background: blue; }
+        &.green { background: green; }
+        &.red { background: red; }
+      }
+    }
+  }
+}

@@ -2,6 +2,20 @@
 const checkIsShapePart = (shape, newI, newJ) =>
   shape.some((cell) => cell.i === newI && cell.j === newJ);
 
+export const validateSpawn = (board, shape) => {
+  shape.forEach(({ i, j }) => {
+    if (
+      i >= 0 &&
+      i < board.length &&
+      j >= 0 &&
+      j < board[0].length &&
+      board[i][j] !== false
+    ) {
+      throw new Error("Cannot spawn shape — position occupied");
+    }
+  });
+};
+
 export const validateBoard = (board) => {
   if (!Array.isArray(board)) {
     throw new Error("Board is not an array");
