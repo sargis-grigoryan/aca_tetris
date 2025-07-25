@@ -16,6 +16,25 @@ export const validateSpawn = (board, shape) => {
   });
 };
 
+export const validateRotation = (board, rotatedShape) => {
+  const height = board.length;
+  const width = board[0].length;
+
+  for (const { i, j } of rotatedShape) {
+    if (i < 0) continue;
+
+    if (
+      i >= height ||
+      j < 0 ||
+      j >= width ||
+      board[i][j] !== false
+    ) {
+      throw new Error("Rotation blocked");
+    }
+  }
+};
+
+
 export const validateBoard = (board) => {
   if (!Array.isArray(board)) {
     throw new Error("Board is not an array");

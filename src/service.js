@@ -5,6 +5,7 @@ import {
   validateLeftMove,
   validateRightMove,
   validateShape,
+  validateRotation,
 } from "./validations";
 
 const clearShapeFromBoard = (board, shape) => {
@@ -14,6 +15,32 @@ const clearShapeFromBoard = (board, shape) => {
     }
   });
 };
+
+export const rotateShape = (board, shape) => {
+  const pivot = shape[1];
+  const rotated = shape.map(({ i, j, color }) => {
+    return {
+      i: pivot.i - (j - pivot.j),
+      j: pivot.j + (i - pivot.i),
+      color,
+    };
+  });
+
+  const newBoard = board.map(row => [...row]);
+  shape.forEach(({ i, j }) => {
+    if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
+      newBoard[i][j] = false;
+    }
+  });
+  rotated.forEach(({ i, j, color }) => {
+    if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
+      newBoard[i][j] = color;
+    }
+  });
+
+  return { newBoard, newShape: rotated };
+};
+
 
 export const move = (board, shape, direction) => {
   validateBoard(board);

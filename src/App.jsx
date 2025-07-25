@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.scss";
-import { move } from "./service";
+import { move, rotateShape } from "./service";
 import { DIRECTIONS } from "./constants";
 import { getRandomShape } from "./gameHelpers";
 import { validateSpawn } from "./validations";
@@ -98,84 +98,92 @@ const resetGame = (showStart = true) => {
   setLinesClearedTotal(0);
 };
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (isGameOver) return;
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (isGameOver) return;
 
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      try {
+        const { newBoard, newShape } = move(board, shape, DIRECTIONS.LEFT);
+        setBoard(newBoard);
+        setShape(newShape);
+      } catch {}
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      try {
+        const { newBoard, newShape } = move(board, shape, DIRECTIONS.RIGHT);
+        setBoard(newBoard);
+        setShape(newShape);
+      } catch {}
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      moveDown();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      console.log("Rotate key pressed");
+      try {
+        const { newBoard, newShape } = rotateShape(board, shape);
+        setBoard(newBoard);
+        setShape(newShape);
+      } catch (err) {
+        console.warn("Rotation failed:", err.message);
+      }
+    } else if (e.key === " ") {
+      e.preventDefault();
+
+      let currentBoard = board;
+      let currentShape = shape;
+      let dropDistance = 0;
+
+      while (true) {
         try {
-          const { newBoard, newShape } = move(board, shape, DIRECTIONS.LEFT);
-          setBoard(newBoard);
-          setShape(newShape);
-        } catch {}
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        try {
-          const { newBoard, newShape } = move(board, shape, DIRECTIONS.RIGHT);
-          setBoard(newBoard);
-          setShape(newShape);
-        } catch {}
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        moveDown();
-      } else if (e.key === " ") {
-        e.preventDefault();
-
-        let currentBoard = board;
-        let currentShape = shape;
-        let dropDistance = 0;
-
-        while (true) {
-          try {
-            const { newBoard, newShape } = move(currentBoard, currentShape, DIRECTIONS.DOWN);
-            currentBoard = newBoard;
-            currentShape = newShape;
-            dropDistance++;
-          } catch {
-            break;
-          }
-        }
-
-        const { board: clearedBoard, linesCleared } = clearFullLines(currentBoard);
-
-        if (linesCleared > 0) {
-          setLinesClearedTotal((prev) => {
-            const newTotal = prev + linesCleared;
-            if (Math.floor(newTotal / 10) > level) {
-              setLevel(Math.floor(newTotal / 10));
-            }
-            return newTotal;
-          });
-
-          const pointsPerLine = [0, 40, 100, 300, 1200];
-          const gained = pointsPerLine[linesCleared] * (level + 1);
-          setScore((prev) => prev + gained);
-        }
-
-        try {
-          validateSpawn(clearedBoard, nextShape);
-
-          const { newBoard: boardWithNewShape, newShape: updatedShape } = move(
-            clearedBoard,
-            nextShape,
-            DIRECTIONS.DOWN
-          );
-
-          setBoard(boardWithNewShape);
-          setShape(updatedShape);
-          setNextShape(getRandomShape());
-
-          setScore((prev) => prev + dropDistance * 1);
+          const { newBoard, newShape } = move(currentBoard, currentShape, DIRECTIONS.DOWN);
+          currentBoard = newBoard;
+          currentShape = newShape;
+          dropDistance++;
         } catch {
-          setIsGameOver(true);
+          break;
         }
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [board, shape, nextShape, level, isGameOver]);
 
+      const { board: clearedBoard, linesCleared } = clearFullLines(currentBoard);
+
+      if (linesCleared > 0) {
+        setLinesClearedTotal((prev) => {
+          const newTotal = prev + linesCleared;
+          if (Math.floor(newTotal / 10) > level) {
+            setLevel(Math.floor(newTotal / 10));
+          }
+          return newTotal;
+        });
+
+        const pointsPerLine = [0, 40, 100, 300, 1200];
+        const gained = pointsPerLine[linesCleared] * (level + 1);
+        setScore((prev) => prev + gained);
+      }
+
+      try {
+        validateSpawn(clearedBoard, nextShape);
+        const { newBoard: boardWithNewShape, newShape: updatedShape } = move(
+          clearedBoard,
+          nextShape,
+          DIRECTIONS.DOWN
+        );
+
+        setBoard(boardWithNewShape);
+        setShape(updatedShape);
+        setNextShape(getRandomShape());
+        setScore((prev) => prev + dropDistance * 1);
+      } catch {
+        setIsGameOver(true);
+      }
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, [board, shape, nextShape, level, isGameOver]);
 
 
 return (
