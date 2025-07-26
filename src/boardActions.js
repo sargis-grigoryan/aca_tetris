@@ -22,5 +22,3 @@ export const clearFullLines = (board) => {
     linesCleared
   };
 };
-
-

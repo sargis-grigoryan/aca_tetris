@@ -1,4 +1,3 @@
-// Do not validate positions which are part of the shape
 const checkIsShapePart = (shape, newI, newJ) =>
   shape.some((cell) => cell.i === newI && cell.j === newJ);
 
@@ -16,12 +15,15 @@ export const validateSpawn = (board, shape) => {
   });
 };
 
-export const validateRotation = (board, rotatedShape) => {
+export const validateRotation = (board, rotatedShape, originalShape) => {
   const height = board.length;
   const width = board[0].length;
 
   for (const { i, j } of rotatedShape) {
     if (i < 0) continue;
+
+    const isOriginalPart = originalShape.some(cell => cell.i === i && cell.j === j);
+    if (isOriginalPart) continue;
 
     if (
       i >= height ||
@@ -33,7 +35,6 @@ export const validateRotation = (board, rotatedShape) => {
     }
   }
 };
-
 
 export const validateBoard = (board) => {
   if (!Array.isArray(board)) {
@@ -109,5 +110,3 @@ export const validateDownMove = (board, shape) => {
     }
   });
 };
-
-

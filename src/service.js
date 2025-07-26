@@ -1,4 +1,5 @@
 import { DIRECTIONS } from "./constants";
+import { JLSTZ_KICKS, I_KICKS } from "./srs";
 import {
   validateBoard,
   validateDownMove,
@@ -16,30 +17,65 @@ const clearShapeFromBoard = (board, shape) => {
   });
 };
 
-export const rotateShape = (board, shape) => {
-  const pivot = shape[1];
-  const rotated = shape.map(({ i, j, color }) => {
-    return {
-      i: pivot.i - (j - pivot.j),
-      j: pivot.j + (i - pivot.i),
-      color,
-    };
-  });
 
-  const newBoard = board.map(row => [...row]);
-  shape.forEach(({ i, j }) => {
-    if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
-      newBoard[i][j] = false;
-    }
-  });
-  rotated.forEach(({ i, j, color }) => {
-    if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
-      newBoard[i][j] = color;
-    }
-  });
 
-  return { newBoard, newShape: rotated };
+const getKickData = (shapeType, from, to) => {
+  if (shapeType === "I") return I_KICKS[`${from}->${to}`];
+  if (["J", "L", "S", "T", "Z"].includes(shapeType)) return JLSTZ_KICKS[`${from}->${to}`];
+  return [[0, 0]];
 };
+
+
+export const rotateShape = (board, shape, rotationState, shapeType) => {
+  if (shapeType === "O") {
+    return { newBoard: board, newShape: shape, newRotationState: rotationState };
+  }
+
+  const pivot = shape[1];
+  const rotated = shape.map(({ i, j, color }) => ({
+    i: pivot.i - (j - pivot.j),
+    j: pivot.j + (i - pivot.i),
+    color,
+  }));
+
+  const from = rotationState;
+  const to = (rotationState + 1) % 4;
+  const kicks = getKickData(shapeType, from, to);
+
+  for (const [moveRow, moveCol] of kicks) {
+    const kickedShape = rotated.map(({ i, j, color }) => ({
+      i: i + moveRow,
+      j: j + moveCol,
+      color,
+    }));
+
+    try {
+     validateRotation(board, kickedShape, shape);
+
+      const newBoard = board.map(row => [...row]);
+      shape.forEach(({ i, j }) => {
+        if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
+          newBoard[i][j] = false;
+        }
+      });
+      kickedShape.forEach(({ i, j, color }) => {
+        if (i >= 0 && i < board.length && j >= 0 && j < board[0].length) {
+          newBoard[i][j] = color;
+        }
+      });
+
+      return { newBoard, newShape: kickedShape, newRotationState: to };
+    } catch {
+      // Ignore 
+    }
+  }
+
+  throw new Error("Rotation failed - no valid kicks");
+};
+
+
+
+
 
 
 export const move = (board, shape, direction) => {
